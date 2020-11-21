@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using RiotNet;
 using RiotNet.Models;
 
@@ -10,21 +11,35 @@ namespace RiotAPI
 
         static void Main(string[] args)
         {
-            GetSummonerData();
+            Get();
             Console.ReadKey();
         }
-        static async void GetSummonerData()
+        static async void Get()
         {
-            IRiotClient client = new RiotClient(new RiotClientSettings
+            string account;
+            Console.Write("Enter an account: ");
+            account = Console.ReadLine();
+            await GetSummonerData(account);
+        }
+        static async Task GetSummonerData(string summonerName)
+        {
+            try
             {
-                ApiKey = System.IO.File.ReadAllText(API_KEY_PATH)
-            });
+                IRiotClient client = new RiotClient(new RiotClientSettings
+                {
+                    ApiKey = System.IO.File.ReadAllText(API_KEY_PATH)
+                });
 
-            Summoner summoner = await client.GetSummonerBySummonerNameAsync("KDani99", PlatformId.EUW1).ConfigureAwait(false);
-            Console.WriteLine($"Summoner Name: {summoner.Name}");
-            Console.WriteLine($"Summoner Platform ID: {PlatformId.EUW1}");
-            Console.WriteLine($"Summoner ID: {summoner.Id}");
-            Console.WriteLine($"Summoner Level: {summoner.SummonerLevel}");
+                Summoner summoner = await client.GetSummonerBySummonerNameAsync(summonerName, PlatformId.EUW1).ConfigureAwait(false);
+                Console.WriteLine($"Summoner Name: {summoner.Name}");
+                Console.WriteLine($"Summoner Platform ID: {PlatformId.EUW1}");
+                Console.WriteLine($"Summoner ID: {summoner.Id}");
+                Console.WriteLine($"Summoner Level: {summoner.SummonerLevel}");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Invalid account");
+            }
         }
     }
 }
